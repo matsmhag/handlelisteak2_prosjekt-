@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react"
+import AddForm from "./components/AddForm"
+import ShoppingList from "./components/ShoppingList"
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function makeId() {
+ 
+  return crypto?.randomUUID?.() ?? String(Date.now())
 }
 
-export default App
+const initialItems = [
+  { id: makeId(), name: "Melk", qty: 2, bought: false },
+  { id: makeId(), name: "Egg", qty: 1, bought: true }, 
+];
+
+export default function App() {
+ 
+  const [items, setItems] = useState(initialItems)
+
+  function addItem(name, qty) {
+    const newItem = { id: makeId(), name, qty, bought: false }
+
+    
+    setItems((prev) => [newItem, ...prev])
+  }
+
+  function toggleBought(id) {
+   
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, bought: !item.bought } : item
+      )
+    );
+  }
+
+  function changeQty(id, nextQty) {
+   
+    if (nextQty < 1) return
+
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, qty: nextQty } : item))
+    )
+  }
+
+  return (
+    <main>
+      <header>
+        <h1>Handleliste</h1>
+      </header>
+
+      <section aria-label="Legg til vare">
+        <AddForm onAdd={addItem} />
+      </section>
+
+      <section aria-label="Handleliste">
+        <ShoppingList items={items} onToggle={toggleBought} onQtyChange={changeQty} />
+      </section>
+    </main>
+  );
+}
+
